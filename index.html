@@ -1,0 +1,640 @@
+
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green: #3D6B4F;
+    --green-light: #4D8B63;
+    --green-pale: #E8F0EB;
+    --gold: #B5862A;
+    --gold-pale: #FDF3E0;
+    --dark: #1A1A1A;
+    --gray: #6B7280;
+    --border: #E5E7EB;
+    --bg: #F8F7F4;
+    --white: #FFFFFF;
+    --status-new: #3B82F6;
+    --status-accepted: #8B5CF6;
+    --status-responded: #F59E0B;
+    --status-interested: #10B981;
+    --status-notinterested: #EF4444;
+    --status-meeting: #06B6D4;
+    --status-pending: #6B7280;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--dark); min-height: 100vh; }
+
+  /* HEADER */
+  .header {
+    background: var(--green);
+    padding: 0 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 12px rgba(61,107,79,0.3);
+  }
+  .logo { display: flex; align-items: center; gap: 10px; }
+  .logo-text { font-family: 'DM Serif Display', serif; color: white; font-size: 20px; letter-spacing: 0.02em; }
+  .logo-sub { color: rgba(255,255,255,0.6); font-size: 11px; font-weight: 400; margin-top: -2px; }
+  .header-right { display: flex; align-items: center; gap: 16px; }
+  .client-badge {
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: white;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+  }
+  .export-btn {
+    background: var(--gold);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: opacity 0.2s;
+  }
+  .export-btn:hover { opacity: 0.85; }
+
+  /* MAIN */
+  .main { padding: 28px 32px; max-width: 1400px; margin: 0 auto; }
+
+  /* CAMPAGNE INFO */
+  .campaign-header {
+    background: white;
+    border-radius: 14px;
+    padding: 20px 24px;
+    margin-bottom: 20px;
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  .campaign-info h2 { font-size: 18px; font-weight: 600; color: var(--dark); margin-bottom: 4px; }
+  .campaign-info p { font-size: 13px; color: var(--gray); }
+  .campaign-meta { display: flex; gap: 8px; flex-wrap: wrap; }
+  .meta-tag {
+    background: var(--green-pale);
+    color: var(--green);
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+  }
+
+  /* KPI BLOKKEN */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .kpi-card {
+    background: white;
+    border-radius: 12px;
+    padding: 16px;
+    border: 1px solid var(--border);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .kpi-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--accent, var(--green));
+  }
+  .kpi-number { font-size: 28px; font-weight: 600; color: var(--dark); line-height: 1; margin-bottom: 4px; }
+  .kpi-label { font-size: 11px; color: var(--gray); font-weight: 400; }
+  .kpi-sub { font-size: 11px; color: var(--green); font-weight: 500; margin-top: 2px; }
+
+  /* FILTERS */
+  .filters {
+    background: white;
+    border-radius: 12px;
+    padding: 14px 20px;
+    margin-bottom: 16px;
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .search-box {
+    flex: 1;
+    min-width: 200px;
+    position: relative;
+  }
+  .search-box input {
+    width: 100%;
+    padding: 8px 12px 8px 36px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 13px;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--dark);
+    background: var(--bg);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .search-box input:focus { border-color: var(--green); }
+  .search-icon {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--gray);
+    font-size: 14px;
+  }
+  .filter-select {
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 13px;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--dark);
+    background: var(--bg);
+    outline: none;
+    cursor: pointer;
+  }
+  .filter-label { font-size: 12px; color: var(--gray); font-weight: 500; }
+
+  /* TABEL */
+  .table-wrap {
+    background: white;
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+  }
+  table { width: 100%; border-collapse: collapse; }
+  thead { background: var(--green); }
+  thead th {
+    padding: 12px 16px;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.85);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+  }
+  tbody tr { border-bottom: 1px solid var(--border); transition: background 0.15s; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: var(--green-pale); }
+  td { padding: 12px 16px; font-size: 13px; color: var(--dark); vertical-align: middle; }
+
+  .candidate-info { display: flex; flex-direction: column; gap: 2px; }
+  .candidate-name { font-weight: 600; font-size: 13px; }
+  .candidate-function { font-size: 12px; color: var(--gray); }
+  .candidate-location { font-size: 11px; color: var(--gray); }
+
+  .linkedin-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: #0077B5;
+    color: white;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 500;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: opacity 0.2s;
+  }
+  .linkedin-btn:hover { opacity: 0.85; }
+
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .status-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+
+  .channel-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 500;
+    background: var(--green-pale);
+    color: var(--green);
+  }
+
+  .enriched-data { font-size: 11px; color: var(--gray); line-height: 1.5; }
+  .enriched-tag {
+    display: inline-block;
+    background: var(--gold-pale);
+    color: var(--gold);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 500;
+    margin: 1px;
+  }
+
+  .follow-up {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+  }
+  .follow-up-yes { color: #10B981; font-weight: 600; }
+  .follow-up-no { color: #EF4444; font-weight: 600; }
+
+  .date-text { font-size: 12px; color: var(--gray); white-space: nowrap; }
+  .attempts { font-size: 12px; color: var(--gray); text-align: center; }
+
+  .notes-text {
+    font-size: 11px;
+    color: var(--gray);
+    max-width: 180px;
+    line-height: 1.4;
+    font-style: italic;
+  }
+
+  /* MODAL */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-overlay.active { display: flex; }
+  .modal {
+    background: white;
+    border-radius: 16px;
+    padding: 28px;
+    width: 540px;
+    max-width: 95vw;
+    max-height: 85vh;
+    overflow-y: auto;
+    position: relative;
+  }
+  .modal-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
+  .modal-title { font-size: 18px; font-weight: 600; color: var(--dark); }
+  .modal-close {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    color: var(--gray);
+    padding: 4px;
+    line-height: 1;
+  }
+  .modal-section { margin-bottom: 20px; }
+  .modal-section-title {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--green);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 10px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+  }
+  .modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .modal-field { }
+  .modal-field-label { font-size: 11px; color: var(--gray); margin-bottom: 3px; }
+  .modal-field-value { font-size: 13px; color: var(--dark); font-weight: 500; }
+
+  /* FOOTER */
+  .table-footer {
+    padding: 14px 20px;
+    background: var(--bg);
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--gray);
+  }
+
+  @media (max-width: 900px) {
+    .kpi-grid { grid-template-columns: repeat(3, 1fr); }
+    .main { padding: 16px; }
+    .header { padding: 0 16px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">
+    <div>
+      <div class="logo-text">Scale-Partners</div>
+      <div class="logo-sub">Kandidaat Dashboard</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="client-badge">🏢 Wetron Transport</div>
+    <button class="export-btn" onclick="alert('Export functionaliteit — koppelen aan Google Sheets of CSV export')">↓ Export CSV</button>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- CAMPAGNE INFO -->
+  <div class="campaign-header">
+    <div class="campaign-info">
+      <h2>Campagne: Chauffeurs & Pakketbezorgers</h2>
+      <p>Gestart op 5 mei 2026 · Regio: Noord-Brabant & Limburg · Model: Full Service</p>
+    </div>
+    <div class="campaign-meta">
+      <span class="meta-tag">🇳🇱 Nederland</span>
+      <span class="meta-tag">LinkedIn + E-mail</span>
+      <span class="meta-tag">Maand 1 van 3</span>
+    </div>
+  </div>
+
+  <!-- KPI BLOKKEN -->
+  <div class="kpi-grid">
+    <div class="kpi-card" style="--accent: #3D6B4F">
+      <div class="kpi-number">342</div>
+      <div class="kpi-label">Benaderd</div>
+      <div class="kpi-sub">↑ 342 deze maand</div>
+    </div>
+    <div class="kpi-card" style="--accent: #8B5CF6">
+      <div class="kpi-number">189</div>
+      <div class="kpi-label">Geaccepteerd</div>
+      <div class="kpi-sub">55% acceptatieratio</div>
+    </div>
+    <div class="kpi-card" style="--accent: #F59E0B">
+      <div class="kpi-number">67</div>
+      <div class="kpi-label">Gereageerd</div>
+      <div class="kpi-sub">35% responsratio</div>
+    </div>
+    <div class="kpi-card" style="--accent: #10B981">
+      <div class="kpi-number">18</div>
+      <div class="kpi-label">Geïnteresseerd</div>
+      <div class="kpi-sub">27% conversie</div>
+    </div>
+    <div class="kpi-card" style="--accent: #06B6D4">
+      <div class="kpi-number">9</div>
+      <div class="kpi-label">Gesprekken</div>
+      <div class="kpi-sub">gepland of gevoerd</div>
+    </div>
+    <div class="kpi-card" style="--accent: #B5862A">
+      <div class="kpi-number">2.6%</div>
+      <div class="kpi-label">Conv. ratio</div>
+      <div class="kpi-sub">benaderd → gesprek</div>
+    </div>
+  </div>
+
+  <!-- FILTERS -->
+  <div class="filters">
+    <div class="filter-label">Filter:</div>
+    <div class="search-box">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="searchInput" placeholder="Zoek op naam, functie of woonplaats..." oninput="filterTable()">
+    </div>
+    <select class="filter-select" id="statusFilter" onchange="filterTable()">
+      <option value="">Alle statussen</option>
+      <option value="Benaderd">Benaderd</option>
+      <option value="Geaccepteerd">Geaccepteerd</option>
+      <option value="Gereageerd">Gereageerd</option>
+      <option value="Geïnteresseerd">Geïnteresseerd</option>
+      <option value="Niet geïnteresseerd">Niet geïnteresseerd</option>
+      <option value="Gesprek gepland">Gesprek gepland</option>
+      <option value="In behandeling">In behandeling</option>
+    </select>
+    <select class="filter-select" id="channelFilter" onchange="filterTable()">
+      <option value="">Alle kanalen</option>
+      <option value="LinkedIn">LinkedIn</option>
+      <option value="E-mail">E-mail</option>
+      <option value="LinkedIn + E-mail">LinkedIn + E-mail</option>
+    </select>
+    <select class="filter-select" id="followupFilter" onchange="filterTable()">
+      <option value="">Opvolging</option>
+      <option value="Ja">Ja</option>
+      <option value="Nee">Nee</option>
+    </select>
+  </div>
+
+  <!-- TABEL -->
+  <div class="table-wrap">
+    <table id="candidateTable">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Kandidaat</th>
+          <th>LinkedIn</th>
+          <th>Status</th>
+          <th>Kanaal</th>
+          <th>Pogingen</th>
+          <th>Eerste contact</th>
+          <th>Laatste contact</th>
+          <th>Verrijkte data</th>
+          <th>Opvolging klant</th>
+          <th>Notities</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+    <div class="table-footer">
+      <span id="resultCount">Alle kandidaten worden geladen...</span>
+      <span>Scale-Partners © 2026 — Vertrouwelijk</span>
+    </div>
+  </div>
+</div>
+
+<!-- DETAIL MODAL -->
+<div class="modal-overlay" id="modal" onclick="closeModal(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modalTitle">Kandidaat detail</div>
+      <button class="modal-close" onclick="document.getElementById('modal').classList.remove('active')">✕</button>
+    </div>
+    <div id="modalContent"></div>
+  </div>
+</div>
+
+<script>
+const statusConfig = {
+  "Benaderd":          { color: "#3B82F6", bg: "#EFF6FF" },
+  "Geaccepteerd":      { color: "#8B5CF6", bg: "#F5F3FF" },
+  "Gereageerd":        { color: "#F59E0B", bg: "#FFFBEB" },
+  "Geïnteresseerd":    { color: "#10B981", bg: "#ECFDF5" },
+  "Niet geïnteresseerd":{ color: "#EF4444", bg: "#FEF2F2" },
+  "Gesprek gepland":   { color: "#06B6D4", bg: "#ECFEFF" },
+  "In behandeling":    { color: "#6B7280", bg: "#F9FAFB" }
+};
+
+const candidates = [
+  { id: 1, name: "Mark van den Berg", function: "Vrachtwagenchauffeur CE", location: "Eindhoven", linkedin: "https://linkedin.com/in/mark-vd-berg", status: "Gesprek gepland", channel: "LinkedIn + E-mail", attempts: 3, firstContact: "06-05-2026", lastContact: "12-05-2026", enriched: { email: "m.vdberg@gmail.com", experience: "8 jaar", seniority: "Senior", rijbewijs: "CE + ADR", bedrijf: "Van Gend & Loos" }, followup: "Ja", followupDate: "14-05-2026", notes: "Gesprek ingepland voor 16 mei. Zeer geïnteresseerd in vast contract." },
+  { id: 2, name: "Sandra Pietersen", function: "Pakketbezorger", location: "Tilburg", linkedin: "https://linkedin.com/in/sandra-pietersen", status: "Geïnteresseerd", channel: "LinkedIn", attempts: 2, firstContact: "07-05-2026", lastContact: "11-05-2026", enriched: { email: "s.pietersen@hotmail.com", experience: "3 jaar", seniority: "Medior", rijbewijs: "B", bedrijf: "DHL Express" }, followup: "Nee", followupDate: "", notes: "Reageert snel. Wacht op terugbel klant." },
+  { id: 3, name: "Ahmed El Ouali", function: "Chauffeur Distributie", location: "Breda", linkedin: "https://linkedin.com/in/ahmed-elouali", status: "Gereageerd", channel: "LinkedIn", attempts: 2, firstContact: "08-05-2026", lastContact: "13-05-2026", enriched: { email: "ahmed.elouali@outlook.com", experience: "5 jaar", seniority: "Medior", rijbewijs: "C + CE", bedrijf: "Geodis" }, followup: "Nee", followupDate: "", notes: "Vraagt naar salaris en reisafstand. Nog geen opvolging door klant." },
+  { id: 4, name: "Roos Janssen", function: "Last Mile Bezorger", location: "Venlo", linkedin: "https://linkedin.com/in/roos-janssen", status: "Geaccepteerd", channel: "LinkedIn", attempts: 1, firstContact: "09-05-2026", lastContact: "09-05-2026", enriched: { email: "roos.janssen@gmail.com", experience: "2 jaar", seniority: "Junior", rijbewijs: "B", bedrijf: "PostNL" }, followup: "Nee", followupDate: "", notes: "" },
+  { id: 5, name: "Tom de Vries", function: "Chauffeur CE", location: "Roermond", linkedin: "https://linkedin.com/in/tom-de-vries-chauffeur", status: "Gesprek gepland", channel: "LinkedIn + E-mail", attempts: 4, firstContact: "05-05-2026", lastContact: "14-05-2026", enriched: { email: "tom.devries@gmail.com", experience: "12 jaar", seniority: "Senior", rijbewijs: "CE + ADR + Code 95", bedrijf: "Vos Logistics" }, followup: "Ja", followupDate: "15-05-2026", notes: "Topkandidaat. 12 jaar ervaring CE. Gesprek morgen 10:00." },
+  { id: 6, name: "Fatima Bouazza", function: "Pakketbezorger", location: "Helmond", linkedin: "https://linkedin.com/in/fatima-bouazza", status: "Niet geïnteresseerd", channel: "LinkedIn + E-mail", attempts: 3, firstContact: "06-05-2026", lastContact: "10-05-2026", enriched: { email: "f.bouazza@gmail.com", experience: "1 jaar", seniority: "Junior", rijbewijs: "B", bedrijf: "Amazon Flex" }, followup: "Nee", followupDate: "", notes: "Geeft aan net vaste baan gevonden. Over 6 maanden opnieuw benaderen." },
+  { id: 7, name: "Peter Kuijpers", function: "Logistiek Medewerker", location: "Den Bosch", linkedin: "https://linkedin.com/in/peter-kuijpers-logistiek", status: "Gereageerd", channel: "E-mail", attempts: 2, firstContact: "07-05-2026", lastContact: "12-05-2026", enriched: { email: "p.kuijpers@ziggo.nl", experience: "6 jaar", seniority: "Medior", rijbewijs: "C", bedrijf: "DB Schenker" }, followup: "Nee", followupDate: "", notes: "Geïnteresseerd maar vraagt naar thuiswerkopties. Opvolging nodig." },
+  { id: 8, name: "Lisa Hermans", function: "Chauffeur B+E", location: "Weert", linkedin: "https://linkedin.com/in/lisa-hermans-transport", status: "Geïnteresseerd", channel: "LinkedIn", attempts: 2, firstContact: "08-05-2026", lastContact: "13-05-2026", enriched: { email: "l.hermans@gmail.com", experience: "4 jaar", seniority: "Medior", rijbewijs: "B+E", bedrijf: "Zelfstandig" }, followup: "Ja", followupDate: "15-05-2026", notes: "Wil graag meer weten over het bedrijf. Terugbellen afgesproken." },
+  { id: 9, name: "Mehmet Yilmaz", function: "Vrachtwagenchauffeur C", location: "Sittard", linkedin: "https://linkedin.com/in/mehmet-yilmaz-chauffeur", status: "Benaderd", channel: "LinkedIn", attempts: 1, firstContact: "14-05-2026", lastContact: "14-05-2026", enriched: { email: "", experience: "9 jaar", seniority: "Senior", rijbewijs: "C + CE", bedrijf: "Rhenus Logistics" }, followup: "Nee", followupDate: "", notes: "" },
+  { id: 10, name: "Annelies de Groot", function: "Pakketbezorger Parttime", location: "Venray", linkedin: "https://linkedin.com/in/annelies-degroot", status: "Geaccepteerd", channel: "LinkedIn", attempts: 1, firstContact: "13-05-2026", lastContact: "13-05-2026", enriched: { email: "annelies.degroot@outlook.com", experience: "2 jaar", seniority: "Junior", rijbewijs: "B", bedrijf: "DPD" }, followup: "Nee", followupDate: "", notes: "" },
+  { id: 11, name: "Bart Smeets", function: "Distributiechauffeur", location: "Maastricht", linkedin: "https://linkedin.com/in/bart-smeets-distributie", status: "In behandeling", channel: "LinkedIn + E-mail", attempts: 3, firstContact: "06-05-2026", lastContact: "12-05-2026", enriched: { email: "bart.smeets@gmail.com", experience: "7 jaar", seniority: "Senior", rijbewijs: "CE", bedrijf: "GLS Netherlands" }, followup: "Ja", followupDate: "13-05-2026", notes: "In gesprek met klant. Tweede gesprek ingepland." },
+  { id: 12, name: "Nadia Willems", function: "Last Mile Courier", location: "Roermond", linkedin: "https://linkedin.com/in/nadia-willems-courier", status: "Benaderd", channel: "LinkedIn", attempts: 1, firstContact: "14-05-2026", lastContact: "14-05-2026", enriched: { email: "", experience: "3 jaar", seniority: "Junior", rijbewijs: "B", bedrijf: "Cycloon Koeriers" }, followup: "Nee", followupDate: "", notes: "" }
+];
+
+let filteredData = [...candidates];
+
+function renderTable(data) {
+  const tbody = document.getElementById('tableBody');
+  tbody.innerHTML = '';
+  
+  data.forEach((c, idx) => {
+    const s = statusConfig[c.status] || { color: "#6B7280", bg: "#F9FAFB" };
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td style="color:var(--gray);font-size:12px;">${idx + 1}</td>
+      <td>
+        <div class="candidate-info">
+          <div class="candidate-name">${c.name}</div>
+          <div class="candidate-function">${c.function}</div>
+          <div class="candidate-location">📍 ${c.location}</div>
+        </div>
+      </td>
+      <td>
+        <a href="${c.linkedin}" target="_blank" class="linkedin-btn">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="white"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+          Profiel
+        </a>
+      </td>
+      <td>
+        <span class="status-badge" style="background:${s.bg};color:${s.color};">
+          <span class="status-dot" style="background:${s.color};"></span>
+          ${c.status}
+        </span>
+      </td>
+      <td><span class="channel-badge">${c.channel}</span></td>
+      <td class="attempts">${c.attempts}×</td>
+      <td class="date-text">${c.firstContact}</td>
+      <td class="date-text">${c.lastContact}</td>
+      <td>
+        <div>
+          ${c.enriched.rijbewijs ? `<span class="enriched-tag">🪪 ${c.enriched.rijbewijs}</span>` : ''}
+          ${c.enriched.experience ? `<span class="enriched-tag">⏱ ${c.enriched.experience}</span>` : ''}
+          ${c.enriched.seniority ? `<span class="enriched-tag">${c.enriched.seniority}</span>` : ''}
+          ${c.enriched.email ? `<span class="enriched-tag">✉ Email</span>` : '<span class="enriched-tag" style="opacity:0.5">Geen email</span>'}
+        </div>
+      </td>
+      <td>
+        <span class="${c.followup === 'Ja' ? 'follow-up-yes' : 'follow-up-no'} follow-up">
+          ${c.followup === 'Ja' ? '✓ Ja' : '✗ Nee'}
+          ${c.followupDate ? `<span style="color:var(--gray);font-weight:400;">${c.followupDate}</span>` : ''}
+        </span>
+      </td>
+      <td class="notes-text">${c.notes || '—'}</td>
+      <td>
+        <button onclick="openModal(${c.id})" style="background:var(--green-pale);color:var(--green);border:none;padding:5px 10px;border-radius:6px;font-size:11px;cursor:pointer;font-weight:600;font-family:'DM Sans',sans-serif;">Detail</button>
+      </td>
+    `;
+    tbody.appendChild(row);
+  });
+
+  document.getElementById('resultCount').textContent = `${data.length} van ${candidates.length} kandidaten`;
+}
+
+function filterTable() {
+  const search = document.getElementById('searchInput').value.toLowerCase();
+  const status = document.getElementById('statusFilter').value;
+  const channel = document.getElementById('channelFilter').value;
+  const followup = document.getElementById('followupFilter').value;
+
+  filteredData = candidates.filter(c => {
+    const matchSearch = !search || 
+      c.name.toLowerCase().includes(search) || 
+      c.function.toLowerCase().includes(search) || 
+      c.location.toLowerCase().includes(search);
+    const matchStatus = !status || c.status === status;
+    const matchChannel = !channel || c.channel.includes(channel);
+    const matchFollowup = !followup || c.followup === followup;
+    return matchSearch && matchStatus && matchChannel && matchFollowup;
+  });
+
+  renderTable(filteredData);
+}
+
+function openModal(id) {
+  const c = candidates.find(x => x.id === id);
+  if (!c) return;
+  const s = statusConfig[c.status] || { color: "#6B7280", bg: "#F9FAFB" };
+  
+  document.getElementById('modalTitle').textContent = c.name;
+  document.getElementById('modalContent').innerHTML = `
+    <div class="modal-section">
+      <div class="modal-section-title">Kandidaatgegevens</div>
+      <div class="modal-grid">
+        <div class="modal-field"><div class="modal-field-label">Functie</div><div class="modal-field-value">${c.function}</div></div>
+        <div class="modal-field"><div class="modal-field-label">Woonplaats</div><div class="modal-field-value">${c.location}</div></div>
+        <div class="modal-field"><div class="modal-field-label">LinkedIn</div><div class="modal-field-value"><a href="${c.linkedin}" target="_blank" class="linkedin-btn">Bekijk profiel</a></div></div>
+        <div class="modal-field"><div class="modal-field-label">Status</div><div class="modal-field-value"><span class="status-badge" style="background:${s.bg};color:${s.color};"><span class="status-dot" style="background:${s.color};"></span>${c.status}</span></div></div>
+      </div>
+    </div>
+    <div class="modal-section">
+      <div class="modal-section-title">Verrijkte data (Clay)</div>
+      <div class="modal-grid">
+        <div class="modal-field"><div class="modal-field-label">E-mailadres</div><div class="modal-field-value">${c.enriched.email || 'Niet gevonden'}</div></div>
+        <div class="modal-field"><div class="modal-field-label">Ervaring</div><div class="modal-field-value">${c.enriched.experience}</div></div>
+        <div class="modal-field"><div class="modal-field-label">Senioriteitsniveau</div><div class="modal-field-value">${c.enriched.seniority}</div></div>
+        <div class="modal-field"><div class="modal-field-label">Huidig bedrijf</div><div class="modal-field-value">${c.enriched.bedrijf}</div></div>
+        ${c.enriched.rijbewijs ? `<div class="modal-field"><div class="modal-field-label">Rijbewijs</div><div class="modal-field-value">${c.enriched.rijbewijs}</div></div>` : ''}
+      </div>
+    </div>
+    <div class="modal-section">
+      <div class="modal-section-title">Campagnedata</div>
+      <div class="modal-grid">
+        <div class="modal-field"><div class="modal-field-label">Kanaal</div><div class="modal-field-value">${c.channel}</div></div>
+        <div class="modal-field"><div class="modal-field-label">Aantal pogingen</div><div class="modal-field-value">${c.attempts}×</div></div>
+        <div class="modal-field"><div class="modal-field-label">Eerste contact</div><div class="modal-field-value">${c.firstContact}</div></div>
+        <div class="modal-field"><div class="modal-field-label">Laatste contact</div><div class="modal-field-value">${c.lastContact}</div></div>
+      </div>
+    </div>
+    <div class="modal-section">
+      <div class="modal-section-title">Opvolging & Notities</div>
+      <div class="modal-grid">
+        <div class="modal-field"><div class="modal-field-label">Opvolging klant</div><div class="modal-field-value ${c.followup === 'Ja' ? 'follow-up-yes' : 'follow-up-no'}">${c.followup === 'Ja' ? '✓ Ja' : '✗ Nee'}</div></div>
+        ${c.followupDate ? `<div class="modal-field"><div class="modal-field-label">Datum opvolging</div><div class="modal-field-value">${c.followupDate}</div></div>` : ''}
+      </div>
+      ${c.notes ? `<div style="margin-top:10px;padding:12px;background:var(--bg);border-radius:8px;font-size:13px;color:var(--gray);line-height:1.5;font-style:italic;">${c.notes}</div>` : ''}
+    </div>
+  `;
+  document.getElementById('modal').classList.add('active');
+}
+
+function closeModal(e) {
+  if (e.target === document.getElementById('modal')) {
+    document.getElementById('modal').classList.remove('active');
+  }
+}
+
+renderTable(candidates);
+</script>
+</body>
+</html>
